@@ -10,10 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Iconos de Lucide para una mejor interfaz -->
-    <script src="https://unpkg.com/lucide-react@0.292.0/dist/lucide-react.js"></script>
-    <script src="https://unpkg.com/lucide-icons@0.378.0/dist/lucide.min.js"></script>
-
+    
     <style>
         /* Estilo base para la aplicación */
         body {
@@ -42,7 +39,7 @@
                 <p class="text-gray-600 mt-2">Una solución simple para administrar tus productos.</p>
             </header>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="grid grid-cols-1 lg-grid-cols-2 gap-8">
                 
                 <!-- Columna del Formulario -->
                 <div class="bg-white p-8 rounded-2xl shadow-lg">
@@ -122,6 +119,9 @@
         <div id="notification-container" class="fixed top-5 right-5 z-50"></div>
     </div>
 
+    <!-- Iconos de Lucide -->
+    <script src="https://unpkg.com/lucide-icons@0.378.0/dist/lucide.min.js"></script>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // --- REFERENCIAS A ELEMENTOS DEL DOM ---
@@ -130,40 +130,64 @@
             const emptyState = document.getElementById('empty-state');
             const notificationContainer = document.getElementById('notification-container');
 
-            // --- ESTADO DE LA APLICACIÓN ---
-            let products = [];
+            // --- ESTADO DE LA APLICACIÓN (DATOS DE EJEMPLO) ---
+            let products = [
+                {
+                    id: 1,
+                    name: 'Laptop Pro 15"',
+                    sku: 'LP-PRO-15',
+                    salePrice: 1200.00,
+                    purchasePrice: 950.00,
+                    wholesalePrice: 1100.00,
+                    quantity: 25,
+                    barcode: '1234567890123',
+                    photoUrl: 'https://placehold.co/400x400/e2e8f0/4a5568?text=Laptop'
+                }
+            ];
 
-            // --- FUNCIONES DE LA API (CONECTADAS) ---
-            
+            // --- FUNCIONES DE LA API (SIMULADAS PARA PRUEBAS LOCALES) ---
+            // Estas funciones simulan la comunicación con un backend.
+            // Cuando despliegues en Netlify, deberás cambiar este código por las peticiones 'fetch' reales.
+
             /**
-             * Obtiene todos los productos desde la Netlify Function.
+             * Obtiene todos los productos.
              * @returns {Promise<Array>} Una promesa que resuelve a un array de productos.
              */
             async function fetchProducts() {
-                console.log('Fetching products from API...');
-                const response = await fetch('/.netlify/functions/get-products');
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return await response.json();
+                console.log('Fetching products (simulation)...');
+                // SIMULACIÓN: Devolvemos los datos locales después de un pequeño retraso.
+                return new Promise(resolve => setTimeout(() => resolve(products), 500));
+                
+                // CÓDIGO REAL (para cuando se despliegue en Netlify)
+                // const response = await fetch('/.netlify/functions/get-products');
+                // if (!response.ok) {
+                //     throw new Error('Network response was not ok');
+                // }
+                // return await response.json();
             }
 
             /**
-             * Guarda un nuevo producto usando la Netlify Function.
+             * Guarda un nuevo producto.
              * @param {Object} productData - Los datos del producto a guardar.
              * @returns {Promise<Object>} Una promesa que resuelve al nuevo producto guardado.
              */
             async function saveProduct(productData) {
-                console.log('Saving product via API:', productData);
-                const response = await fetch('/.netlify/functions/create-product', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(productData)
-                });
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return await response.json();
+                console.log('Saving product (simulation):', productData);
+                // SIMULACIÓN: Añadimos el producto al array local.
+                const newProduct = { id: Date.now(), ...productData };
+                products.push(newProduct);
+                return new Promise(resolve => setTimeout(() => resolve(newProduct), 300));
+
+                // CÓDIGO REAL (para cuando se despliegue en Netlify)
+                // const response = await fetch('/.netlify/functions/create-product', {
+                //   method: 'POST',
+                //   headers: { 'Content-Type': 'application/json' },
+                //   body: JSON.stringify(productData)
+                // });
+                // if (!response.ok) {
+                //     throw new Error('Network response was not ok');
+                // }
+                // return await response.json();
             }
 
             // --- LÓGICA DE LA INTERFAZ ---
@@ -184,7 +208,10 @@
                     <p>${message}</p>
                 `;
                 notificationContainer.appendChild(notification);
-                lucide.createIcons(); // Renderizar el icono
+                // Renderizar el icono después de añadir el elemento al DOM
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                }
 
                 // Animar la entrada
                 setTimeout(() => {
@@ -284,7 +311,11 @@
             // --- INICIALIZACIÓN ---
             productForm.addEventListener('submit', handleFormSubmit);
             loadAndRenderProducts(); // Cargar productos al iniciar la página
-            lucide.createIcons(); // Renderizar iconos iniciales
+            
+            // Renderizar iconos iniciales
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
         });
     </script>
 </body>
