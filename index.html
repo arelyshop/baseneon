@@ -25,6 +25,19 @@
         .notification {
             transition: opacity 0.5s, transform 0.5s;
         }
+        /* Estilo para el spinner de carga */
+        .spinner {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #3498db;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="antialiased text-gray-800">
@@ -39,7 +52,7 @@
                 <p class="text-gray-600 mt-2">Una solución simple para administrar tus productos.</p>
             </header>
 
-            <div class="grid grid-cols-1 lg-grid-cols-2 gap-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 
                 <!-- Columna del Formulario -->
                 <div class="bg-white p-8 rounded-2xl shadow-lg">
@@ -47,7 +60,7 @@
                     <p class="text-gray-500 mb-6">Completa los campos para añadir o actualizar un artículo.</p>
                     
                     <form id="product-form" class="space-y-4">
-                        <!-- Nombre y SKU -->
+                        <!-- Campos del formulario... -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label for="product-name" class="block text-sm font-medium text-gray-700 mb-1">Nombre del Producto</label>
@@ -58,8 +71,6 @@
                                 <input type="text" id="sku" name="sku" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" placeholder="Ej: CAM-ALG-001">
                             </div>
                         </div>
-
-                        <!-- Precios -->
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div>
                                 <label for="price-sale" class="block text-sm font-medium text-gray-700 mb-1">Precio (Venta)</label>
@@ -74,8 +85,6 @@
                                 <input type="number" id="price-wholesale" name="price-wholesale" step="0.01" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" placeholder="0.00">
                             </div>
                         </div>
-
-                        <!-- Cantidad y Código de Barras -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label for="quantity" class="block text-sm font-medium text-gray-700 mb-1">Cantidad</label>
@@ -86,16 +95,15 @@
                                 <input type="text" id="barcode" name="barcode" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" placeholder="Ej: 7501000112345">
                             </div>
                         </div>
-                        
-                        <!-- URL de la Foto -->
                         <div>
                             <label for="photo-url" class="block text-sm font-medium text-gray-700 mb-1">URL de la Foto</label>
                             <input type="url" id="photo-url" name="photo-url" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" placeholder="https://ejemplo.com/imagen.jpg">
                         </div>
                         
                         <!-- Botón de envío -->
-                        <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50 transition-transform transform hover:scale-105">
-                            Guardar Producto
+                        <button type="submit" id="submit-button" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50 transition-transform transform hover:scale-105 flex items-center justify-center disabled:opacity-75 disabled:cursor-not-allowed">
+                            <span id="button-text">Guardar Producto</span>
+                            <div id="button-spinner" class="spinner ml-2 hidden"></div>
                         </button>
                     </form>
                 </div>
@@ -129,74 +137,39 @@
             const productList = document.getElementById('product-list');
             const emptyState = document.getElementById('empty-state');
             const notificationContainer = document.getElementById('notification-container');
+            const submitButton = document.getElementById('submit-button');
+            const buttonText = document.getElementById('button-text');
+            const buttonSpinner = document.getElementById('button-spinner');
 
-            // --- ESTADO DE LA APLICACIÓN (DATOS DE EJEMPLO) ---
-            let products = [
-                {
-                    id: 1,
-                    name: 'Laptop Pro 15"',
-                    sku: 'LP-PRO-15',
-                    salePrice: 1200.00,
-                    purchasePrice: 950.00,
-                    wholesalePrice: 1100.00,
-                    quantity: 25,
-                    barcode: '1234567890123',
-                    photoUrl: 'https://placehold.co/400x400/e2e8f0/4a5568?text=Laptop'
-                }
-            ];
+            // --- ESTADO DE LA APLICACIÓN ---
+            let products = [];
 
-            // --- FUNCIONES DE LA API (SIMULADAS PARA PRUEBAS LOCALES) ---
-            // Estas funciones simulan la comunicación con un backend.
-            // Cuando despliegues en Netlify, deberás cambiar este código por las peticiones 'fetch' reales.
-
-            /**
-             * Obtiene todos los productos.
-             * @returns {Promise<Array>} Una promesa que resuelve a un array de productos.
-             */
+            // --- FUNCIONES DE LA API (CONECTADAS) ---
+            
             async function fetchProducts() {
-                console.log('Fetching products (simulation)...');
-                // SIMULACIÓN: Devolvemos los datos locales después de un pequeño retraso.
-                return new Promise(resolve => setTimeout(() => resolve(products), 500));
-                
-                // CÓDIGO REAL (para cuando se despliegue en Netlify)
-                // const response = await fetch('/.netlify/functions/get-products');
-                // if (!response.ok) {
-                //     throw new Error('Network response was not ok');
-                // }
-                // return await response.json();
+                console.log('Fetching products from API...');
+                const response = await fetch('/.netlify/functions/get-products');
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return await response.json();
             }
 
-            /**
-             * Guarda un nuevo producto.
-             * @param {Object} productData - Los datos del producto a guardar.
-             * @returns {Promise<Object>} Una promesa que resuelve al nuevo producto guardado.
-             */
             async function saveProduct(productData) {
-                console.log('Saving product (simulation):', productData);
-                // SIMULACIÓN: Añadimos el producto al array local.
-                const newProduct = { id: Date.now(), ...productData };
-                products.push(newProduct);
-                return new Promise(resolve => setTimeout(() => resolve(newProduct), 300));
-
-                // CÓDIGO REAL (para cuando se despliegue en Netlify)
-                // const response = await fetch('/.netlify/functions/create-product', {
-                //   method: 'POST',
-                //   headers: { 'Content-Type': 'application/json' },
-                //   body: JSON.stringify(productData)
-                // });
-                // if (!response.ok) {
-                //     throw new Error('Network response was not ok');
-                // }
-                // return await response.json();
+                console.log('Saving product via API:', productData);
+                const response = await fetch('/.netlify/functions/create-product', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(productData)
+                });
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return await response.json();
             }
 
             // --- LÓGICA DE LA INTERFAZ ---
 
-            /**
-             * Muestra una notificación en pantalla.
-             * @param {string} message - El mensaje a mostrar.
-             * @param {string} type - 'success' o 'error'.
-             */
             function showNotification(message, type = 'success') {
                 const bgColor = type === 'success' ? 'bg-green-500' : 'bg-red-500';
                 const icon = type === 'success' ? 'check-circle' : 'alert-circle';
@@ -208,28 +181,22 @@
                     <p>${message}</p>
                 `;
                 notificationContainer.appendChild(notification);
-                // Renderizar el icono después de añadir el elemento al DOM
                 if (typeof lucide !== 'undefined') {
                     lucide.createIcons();
                 }
 
-                // Animar la entrada
                 setTimeout(() => {
                     notification.classList.remove('opacity-0', 'translate-y-2');
                 }, 10);
 
-                // Eliminar después de 3 segundos
                 setTimeout(() => {
                     notification.classList.add('opacity-0');
                     notification.addEventListener('transitionend', () => notification.remove());
                 }, 3000);
             }
             
-            /**
-             * Renderiza la lista de productos en el DOM.
-             */
             function renderProducts() {
-                productList.innerHTML = ''; // Limpiar la lista actual
+                productList.innerHTML = '';
                 if (products.length === 0) {
                      if(emptyState) emptyState.style.display = 'block';
                     productList.appendChild(emptyState);
@@ -258,10 +225,20 @@
                     });
                 }
             }
+            
+            // Función para manejar el estado de carga del botón
+            function setButtonLoading(isLoading) {
+                if (isLoading) {
+                    submitButton.disabled = true;
+                    buttonText.textContent = 'Guardando...';
+                    buttonSpinner.classList.remove('hidden');
+                } else {
+                    submitButton.disabled = false;
+                    buttonText.textContent = 'Guardar Producto';
+                    buttonSpinner.classList.add('hidden');
+                }
+            }
 
-            /**
-             * Maneja el envío del formulario.
-             */
             async function handleFormSubmit(event) {
                 event.preventDefault();
                 
@@ -277,30 +254,30 @@
                     photoUrl: formData.get('photo-url')
                 };
 
-                // Validación simple
                 if (!productData.name || !productData.salePrice || isNaN(productData.quantity)) {
                     showNotification('Por favor, completa los campos requeridos.', 'error');
                     return;
                 }
+                
+                setButtonLoading(true); // Activar estado de carga
 
                 try {
                     await saveProduct(productData);
                     showNotification('Producto guardado con éxito.', 'success');
                     productForm.reset();
-                    await loadAndRenderProducts(); // Recargar y renderizar la lista
+                    await loadAndRenderProducts();
                 } catch (error) {
                     console.error('Error saving product:', error);
                     showNotification('Hubo un error al guardar el producto.', 'error');
+                } finally {
+                    setButtonLoading(false); // Desactivar estado de carga
                 }
             }
 
-            /**
-             * Carga los productos iniciales y los renderiza.
-             */
             async function loadAndRenderProducts() {
                 try {
                     const fetchedProducts = await fetchProducts();
-                    products = fetchedProducts; // Actualizar el estado local
+                    products = fetchedProducts;
                     renderProducts();
                 } catch (error) {
                     console.error('Error loading products:', error);
@@ -310,9 +287,8 @@
 
             // --- INICIALIZACIÓN ---
             productForm.addEventListener('submit', handleFormSubmit);
-            loadAndRenderProducts(); // Cargar productos al iniciar la página
+            loadAndRenderProducts();
             
-            // Renderizar iconos iniciales
             if (typeof lucide !== 'undefined') {
                 lucide.createIcons();
             }
