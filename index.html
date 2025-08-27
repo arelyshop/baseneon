@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Inventario</title>
+    <!-- Tailwind CSS para un diseño moderno y responsivo -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter para una tipografía limpia -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Iconos de Lucide para una mejor interfaz -->
+    <script src="https://unpkg.com/lucide-react@0.292.0/dist/lucide-react.js"></script>
+    <script src="https://unpkg.com/lucide-icons@0.378.0/dist/lucide.min.js"></script>
+
+    <style>
+        /* Estilo base para la aplicación */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Gris claro de fondo */
+        }
+        /* Estilo para los placeholders de los inputs */
+        ::placeholder {
+            color: #9ca3af;
+        }
+        /* Animación suave para las notificaciones */
+        .notification {
+            transition: opacity 0.5s, transform 0.5s;
+        }
+    </style>
+</head>
+<body class="antialiased text-gray-800">
+
+    <div class="min-h-screen flex flex-col items-center justify-center p-4">
+        
+        <!-- Contenedor principal -->
+        <div class="w-full max-w-4xl mx-auto">
+            
+            <header class="text-center mb-8">
+                <h1 class="text-4xl font-bold text-gray-900">Gestor de Inventario</h1>
+                <p class="text-gray-600 mt-2">Una solución simple para administrar tus productos.</p>
+            </header>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                
+                <!-- Columna del Formulario -->
+                <div class="bg-white p-8 rounded-2xl shadow-lg">
+                    <h2 class="text-2xl font-bold mb-2">Registrar Nuevo Producto</h2>
+                    <p class="text-gray-500 mb-6">Completa los campos para añadir o actualizar un artículo.</p>
+                    
+                    <form id="product-form" class="space-y-4">
+                        <!-- Nombre y SKU -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="product-name" class="block text-sm font-medium text-gray-700 mb-1">Nombre del Producto</label>
+                                <input type="text" id="product-name" name="product-name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" placeholder="Ej: Camiseta de Algodón">
+                            </div>
+                            <div>
+                                <label for="sku" class="block text-sm font-medium text-gray-700 mb-1">SKU</label>
+                                <input type="text" id="sku" name="sku" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" placeholder="Ej: CAM-ALG-001">
+                            </div>
+                        </div>
+
+                        <!-- Precios -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label for="price-sale" class="block text-sm font-medium text-gray-700 mb-1">Precio (Venta)</label>
+                                <input type="number" id="price-sale" name="price-sale" step="0.01" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" placeholder="0.00">
+                            </div>
+                            <div>
+                                <label for="price-purchase" class="block text-sm font-medium text-gray-700 mb-1">Precio (Compra)</label>
+                                <input type="number" id="price-purchase" name="price-purchase" step="0.01" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" placeholder="0.00">
+                            </div>
+                            <div>
+                                <label for="price-wholesale" class="block text-sm font-medium text-gray-700 mb-1">Precio (Mayoreo)</label>
+                                <input type="number" id="price-wholesale" name="price-wholesale" step="0.01" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" placeholder="0.00">
+                            </div>
+                        </div>
+
+                        <!-- Cantidad y Código de Barras -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="quantity" class="block text-sm font-medium text-gray-700 mb-1">Cantidad</label>
+                                <input type="number" id="quantity" name="quantity" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" placeholder="0">
+                            </div>
+                            <div>
+                                <label for="barcode" class="block text-sm font-medium text-gray-700 mb-1">Código de Barras</label>
+                                <input type="text" id="barcode" name="barcode" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" placeholder="Ej: 7501000112345">
+                            </div>
+                        </div>
+                        
+                        <!-- URL de la Foto -->
+                        <div>
+                            <label for="photo-url" class="block text-sm font-medium text-gray-700 mb-1">URL de la Foto</label>
+                            <input type="url" id="photo-url" name="photo-url" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" placeholder="https://ejemplo.com/imagen.jpg">
+                        </div>
+                        
+                        <!-- Botón de envío -->
+                        <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50 transition-transform transform hover:scale-105">
+                            Guardar Producto
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Columna de la Lista de Productos -->
+                <div class="bg-white p-8 rounded-2xl shadow-lg">
+                    <h2 class="text-2xl font-bold mb-6">Productos Registrados</h2>
+                    <div id="product-list" class="space-y-4 max-h-[600px] overflow-y-auto pr-2">
+                        <!-- Los productos se insertarán aquí dinámicamente -->
+                         <div id="empty-state" class="text-center py-10">
+                            <i data-lucide="package-search" class="mx-auto h-12 w-12 text-gray-400"></i>
+                            <h3 class="mt-2 text-sm font-semibold text-gray-900">No hay productos</h3>
+                            <p class="mt-1 text-sm text-gray-500">Añade un producto usando el formulario.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenedor para notificaciones -->
+        <div id="notification-container" class="fixed top-5 right-5 z-50"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- REFERENCIAS A ELEMENTOS DEL DOM ---
+            const productForm = document.getElementById('product-form');
+            const productList = document.getElementById('product-list');
+            const emptyState = document.getElementById('empty-state');
+            const notificationContainer = document.getElementById('notification-container');
+
+            // --- ESTADO DE LA APLICACIÓN ---
+            // Ya no usamos el array de ejemplo, los datos vendrán de la API.
+            let products = [];
+
+            // --- FUNCIONES DE LA API (CONECTADAS) ---
+            // Estas funciones ahora hacen peticiones reales a tus Netlify Functions.
+            // ¡Asegúrate de crear estas funciones en tu proyecto de Netlify!
+
+            /**
+             * Obtiene todos los productos desde la Netlify Function.
+             * @returns {Promise<Array>} Una promesa que resuelve a un array de productos.
+             */
+            async function fetchProducts() {
+                console.log('Fetching products from API...');
+                // CÓDIGO REAL: Petición a la función serverless
+                const response = await fetch('/.netlify/functions/get-products');
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return await response.json();
+
+                // CÓDIGO DE SIMULACIÓN (desactivado)
+                // console.log('Fetching products...');
+                // return new Promise(resolve => setTimeout(() => resolve(products), 500));
+            }
+
+            /**
+             * Guarda un nuevo producto usando la Netlify Function.
+             * @param {Object} productData - Los datos del producto a guardar.
+             * @returns {Promise<Object>} Una promesa que resuelve al nuevo producto guardado.
+             */
+            async function saveProduct(productData) {
+                console.log('Saving product via API:', productData);
+                // CÓDIGO REAL: Petición a la función serverless
+                const response = await fetch('/.netlify/functions/create-product', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(productData)
+                });
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return await response.json();
+
+                // CÓDIGO DE SIMULACIÓN (desactivado)
+                // const newProduct = { id: Date.now(), ...productData };
+                // products.push(newProduct);
+                // return new Promise(resolve => setTimeout(() => resolve(newProduct), 300));
+            }
+
+            // --- LÓGICA DE LA INTERFAZ ---
+
+            /**
+             * Muestra una notificación en pantalla.
+             * @param {string} message - El mensaje a mostrar.
+             * @param {string} type - 'success' o 'error'.
+             */
+            function showNotification(message, type = 'success') {
+                const bgColor = type === 'success' ? 'bg-green-500' : 'bg-red-500';
+                const icon = type === 'success' ? 'check-circle' : 'alert-circle';
+
+                const notification = document.createElement('div');
+                notification.className = `notification flex items-center ${bgColor} text-white text-sm font-bold px-4 py-3 rounded-lg shadow-md mb-2 opacity-0 transform translate-y-2`;
+                notification.innerHTML = `
+                    <i data-lucide="${icon}" class="w-5 h-5 mr-2"></i>
+                    <p>${message}</p>
+                `;
+                notificationContainer.appendChild(notification);
+                lucide.createIcons(); // Renderizar el icono
+
+                // Animar la entrada
+                setTimeout(() => {
+                    notification.classList.remove('opacity-0', 'translate-y-2');
+                }, 10);
+
+                // Eliminar después de 3 segundos
+                setTimeout(() => {
+                    notification.classList.add('opacity-0');
+                    notification.addEventListener('transitionend', () => notification.remove());
+                }, 3000);
+            }
+            
+            /**
+             * Renderiza la lista de productos en el DOM.
+             */
+            function renderProducts() {
+                productList.innerHTML = ''; // Limpiar la lista actual
+                if (products.length === 0) {
+                     if(emptyState) emptyState.style.display = 'block';
+                    productList.appendChild(emptyState);
+                } else {
+                     if(emptyState) emptyState.style.display = 'none';
+                    products.forEach(product => {
+                        const productElement = document.createElement('div');
+                        productElement.className = 'flex items-center p-4 border rounded-lg hover:bg-gray-50 transition';
+                        productElement.innerHTML = `
+                            <img src="${product.photoUrl || 'https://placehold.co/100x100/e2e8f0/4a5568?text=Sin+Imagen'}" 
+                                 alt="${product.name}" 
+                                 class="w-16 h-16 rounded-md object-cover mr-4"
+                                 onerror="this.onerror=null;this.src='https://placehold.co/100x100/e2e8f0/4a5568?text=Error';"
+                            >
+                            <div class="flex-grow">
+                                <h4 class="font-bold text-lg">${product.name}</h4>
+                                <p class="text-sm text-gray-500">SKU: ${product.sku || 'N/A'}</p>
+                                <p class="text-sm text-green-600 font-semibold">Venta: $${parseFloat(product.salePrice).toFixed(2)}</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-lg font-bold">${product.quantity}</p>
+                                <p class="text-sm text-gray-500">en stock</p>
+                            </div>
+                        `;
+                        productList.appendChild(productElement);
+                    });
+                }
+            }
+
+            /**
+             * Maneja el envío del formulario.
+             */
+            async function handleFormSubmit(event) {
+                event.preventDefault();
+                
+                const formData = new FormData(productForm);
+                const productData = {
+                    name: formData.get('product-name'),
+                    sku: formData.get('sku'),
+                    salePrice: parseFloat(formData.get('price-sale')),
+                    purchasePrice: parseFloat(formData.get('price-purchase')) || 0,
+                    wholesalePrice: parseFloat(formData.get('price-wholesale')) || 0,
+                    quantity: parseInt(formData.get('quantity')),
+                    barcode: formData.get('barcode'),
+                    photoUrl: formData.get('photo-url')
+                };
+
+                // Validación simple
+                if (!productData.name || !productData.salePrice || isNaN(productData.quantity)) {
+                    showNotification('Por favor, completa los campos requeridos.', 'error');
+                    return;
+                }
+
+                try {
+                    await saveProduct(productData);
+                    showNotification('Producto guardado con éxito.', 'success');
+                    productForm.reset();
+                    await loadAndRenderProducts(); // Recargar y renderizar la lista
+                } catch (error) {
+                    console.error('Error saving product:', error);
+                    showNotification('Hubo un error al guardar el producto.', 'error');
+                }
+            }
+
+            /**
+             * Carga los productos iniciales y los renderiza.
+             */
+            async function loadAndRenderProducts() {
+                try {
+                    const fetchedProducts = await fetchProducts();
+                    products = fetchedProducts; // Actualizar el estado local
+                    renderProducts();
+                } catch (error) {
+                    console.error('Error loading products:', error);
+                    showNotification('No se pudieron cargar los productos.', 'error');
+                }
+            }
+
+            // --- INICIALIZACIÓN ---
+            productForm.addEventListener('submit', handleFormSubmit);
+            loadAndRenderProducts(); // Cargar productos al iniciar la página
+            lucide.createIcons(); // Renderizar iconos iniciales
+        });
+    </script>
+</body>
+</html>
