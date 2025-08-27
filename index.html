@@ -131,29 +131,21 @@
             const notificationContainer = document.getElementById('notification-container');
 
             // --- ESTADO DE LA APLICACIÓN ---
-            // Ya no usamos el array de ejemplo, los datos vendrán de la API.
             let products = [];
 
             // --- FUNCIONES DE LA API (CONECTADAS) ---
-            // Estas funciones ahora hacen peticiones reales a tus Netlify Functions.
-            // ¡Asegúrate de crear estas funciones en tu proyecto de Netlify!
-
+            
             /**
              * Obtiene todos los productos desde la Netlify Function.
              * @returns {Promise<Array>} Una promesa que resuelve a un array de productos.
              */
             async function fetchProducts() {
                 console.log('Fetching products from API...');
-                // CÓDIGO REAL: Petición a la función serverless
                 const response = await fetch('/.netlify/functions/get-products');
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
                 return await response.json();
-
-                // CÓDIGO DE SIMULACIÓN (desactivado)
-                // console.log('Fetching products...');
-                // return new Promise(resolve => setTimeout(() => resolve(products), 500));
             }
 
             /**
@@ -163,7 +155,6 @@
              */
             async function saveProduct(productData) {
                 console.log('Saving product via API:', productData);
-                // CÓDIGO REAL: Petición a la función serverless
                 const response = await fetch('/.netlify/functions/create-product', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
@@ -173,11 +164,6 @@
                     throw new Error('Network response was not ok');
                 }
                 return await response.json();
-
-                // CÓDIGO DE SIMULACIÓN (desactivado)
-                // const newProduct = { id: Date.now(), ...productData };
-                // products.push(newProduct);
-                // return new Promise(resolve => setTimeout(() => resolve(newProduct), 300));
             }
 
             // --- LÓGICA DE LA INTERFAZ ---
